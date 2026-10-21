@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -19,6 +21,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        // Times are stored in UTC and shown in Maldives time (UTC+5).
+        Carbon::macro('mvt', function () {
+            return $this->copy()->setTimezone('Indian/Maldives');
+        });
+
+        Paginator::defaultSimpleView('pagination::simple-tailwind');
     }
 }
