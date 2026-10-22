@@ -7,4 +7,4 @@
         'routine' => 'border-ink-700 text-ink-400',
     ];
 @endphp
-<span {{ $attributes->class(['inline-block rounded-full border px-2 py-px font-mono text-[10px] uppercase tracking-wider', $styles[$tier] ?? $styles['routine']]) }}>{{ $tier }}</span>
+<span {{ $attributes->class(['tier inline-block rounded-full border px-2 py-px font-mono text-[10px] uppercase tracking-wider', $styles[$tier] ?? $styles['routine']]) }}>{{ __($tier) }}</span>

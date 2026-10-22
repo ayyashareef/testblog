@@ -1,3 +1,6 @@
+@import "@fontsource/noto-sans-thaana/400.css";
+@import "@fontsource/noto-sans-thaana/600.css";
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -37,4 +40,28 @@
     .link {
         @apply underline hover:text-ember-300 hover:decoration-ember-400;
     }
+}
+
+/* Dhivehi: Thaana everywhere, and no letter-spacing or capitals, which
+   pull apart the vowel marks. */
+[dir="rtl"] body {
+    @apply font-thaana;
+}
+
+[dir="rtl"] .eyebrow,
+[dir="rtl"] .tier {
+    @apply font-thaana text-xs normal-case tracking-normal;
+}
+
+[dir="rtl"] .meta {
+    @apply font-thaana text-xs;
+}
+
+[dir="rtl"] .stat small {
+    @apply font-thaana text-xs;
+}
+
+[dir="rtl"] h1,
+[dir="rtl"] h2 {
+    line-height: 1.6;
 }

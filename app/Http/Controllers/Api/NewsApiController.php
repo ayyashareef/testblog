@@ -105,6 +105,7 @@ class NewsApiController extends Controller
         $json = [
             'id' => $event->id,
             'title' => $event->title,
+            'title_dv' => $event->title_dv,
             'lang' => $event->lang,
             'tier' => $event->tier,
             'first_seen_at' => $event->first_seen_at->toIso8601String(),
@@ -135,6 +136,7 @@ class NewsApiController extends Controller
             'id' => $situation->id,
             'slug' => $situation->slug,
             'title' => $situation->title,
+            'title_dv' => $situation->title_dv,
             'first_seen_at' => $situation->first_seen_at->toIso8601String(),
             'last_seen_at' => $situation->last_seen_at->toIso8601String(),
             'event_count' => $situation->event_count,

@@ -31,7 +31,7 @@ class Observatory
         $places = EventPlace::selectRaw('place_code, count(*) as n')->groupBy('place_code')->orderByDesc('n')->get()
             ->map(fn ($row) => [
                 'code' => $row->place_code,
-                'name' => config("places.{$row->place_code}.name", $row->place_code),
+                'name' => EventPlace::label($row->place_code),
                 'events' => (int) $row->n,
                 'per_day' => $days ? round($row->n / $days, 1) : 0,
             ]);

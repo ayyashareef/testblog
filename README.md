@@ -30,6 +30,10 @@ php artisan serve
 
 In production, run the scheduler (`* * * * * php artisan schedule:run`). It fetches every ten minutes and snapshots the map every hour.
 
+## Dhivehi version
+
+Every page is available in Dhivehi with a right-to-left layout: use the **ދިވެހި** button in the header, or add `?lang=dv` to any link (the choice is remembered). Interface text lives in `lang/dv.json`; a test fails if a string is added without a translation. Atoll names use their Dhivehi spellings, and when an event includes a Dhivehi article its Dhivehi headline is shown. The Thaana font (Noto Sans Thaana) is bundled with the app instead of loaded from Google Fonts.
+
 ## How it works
 
 - **Sources** live in `config/news.php`. Any RSS or Atom feed works; a broken feed is logged and skipped.
@@ -39,7 +43,8 @@ In production, run the scheduler (`* * * * * php artisan schedule:run`). It fetc
 
 ## Known limits / next steps
 
-- Dhivehi and English reports of the same event are not merged yet. Multilingual embeddings or an LLM pass would fix that.
+- Dhivehi and English reports of the same event are not merged yet, so in the Dhivehi version most headlines from English outlets stay in English. Multilingual embeddings or an LLM pass would fix that.
+- The Dhivehi interface text was written without a native speaker's review; please have someone check `lang/dv.json`.
 - Feed URLs in `config/news.php` are best guesses; check each one with `php artisan news:fetch --source=sun` and adjust.
 - Tiers are rule-based; an LLM judge could rate significance instead.
 - An MCP server over the same data would make it usable from AI assistants.

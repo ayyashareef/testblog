@@ -166,6 +166,7 @@ class Clusterer
 
         $event->fill([
             'title' => $lead->title,
+            'title_dv' => $articles->firstWhere('lang', 'dv')?->title,
             'lang' => $lead->lang,
             'first_seen_at' => $articles->min('published_at'),
             'last_seen_at' => $articles->max('published_at'),

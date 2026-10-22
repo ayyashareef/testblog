@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Services\News\Tokenizer;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -10,7 +11,7 @@ class Event extends Model
 {
     public const TIERS = ['routine', 'notable', 'major', 'exceptional'];
 
-    protected $fillable = ['situation_id', 'title', 'lang', 'first_seen_at', 'last_seen_at', 'article_count', 'source_count', 'tier', 'terms'];
+    protected $fillable = ['situation_id', 'title', 'title_dv', 'lang', 'first_seen_at', 'last_seen_at', 'article_count', 'source_count', 'tier', 'terms'];
 
     protected function casts(): array
     {
@@ -50,8 +51,16 @@ class Event extends Model
         };
     }
 
+    /**
+     * The Dhivehi headline when reading in Dhivehi and one exists.
+     */
+    public function displayTitle(): string
+    {
+        return app()->getLocale() === 'dv' && $this->title_dv ? $this->title_dv : $this->title;
+    }
+
     public function isRtl(): bool
     {
-        return $this->lang === 'dv';
+        return Tokenizer::isThaana($this->displayTitle());
     }
 }

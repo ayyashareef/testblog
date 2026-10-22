@@ -22,6 +22,16 @@ class EventPlace extends Model
 
     public function name(): string
     {
-        return config("places.{$this->place_code}.name", $this->place_code);
+        return static::label($this->place_code);
+    }
+
+    /**
+     * A place's name in the current language.
+     */
+    public static function label(string $code): string
+    {
+        $key = app()->getLocale() === 'dv' ? 'name_dv' : 'name';
+
+        return config("places.{$code}.{$key}", $code);
     }
 }

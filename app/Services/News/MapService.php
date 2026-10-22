@@ -208,7 +208,7 @@ class MapService
             [$x, $y] = $this->project($p['lat'], $p['lng'] + $p['rx']);
             $labels[] = [
                 'code' => $code,
-                'name' => $p['name'],
+                'name' => EventPlace::label($code),
                 'count' => $counts[$code] ?? 0,
                 'anchor_x' => round($x + 3, 1),
                 'anchor_y' => round($y, 1),
