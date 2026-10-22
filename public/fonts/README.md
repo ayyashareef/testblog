@@ -1,9 +1,12 @@
 # Fonts
 
-Put the Waheed font here as `waheed.woff2` (or `waheed.ttf`). Bold Dhivehi
-text (headings and headlines) uses it. Visitors who have A_Waheed installed
-get it from their own computer. Without the file, bold Dhivehi falls back to
-Noto Sans Thaana Bold.
+- `waheed.otf`: MV Waheed, used for Dhivehi headings and headlines. Named
+  after calligrapher Abdulla Waheed; created by Hassan Shujau and Hassan
+  Hameed, re-mapped by Ahmed Niyaz. Its copyright notice restricts editing,
+  so it is served exactly as distributed. It carries no explicit web
+  licence; confirm you may serve it publicly.
+- `source-serif-4.woff2`: Source Serif 4 (variable), used for English
+  headings and headlines. SIL Open Font License 1.1, see
+  `OFL-source-serif-4.txt`.
 
-Waheed is not committed to this repository because its licence is unclear;
-make sure you are allowed to serve it before adding it.
+Body text uses Inter (Google Fonts) and Noto Sans Thaana (bundled via npm).
