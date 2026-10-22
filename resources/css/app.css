@@ -65,3 +65,24 @@
 [dir="rtl"] h2 {
     line-height: 1.6;
 }
+
+/* Bold Dhivehi uses Waheed, the usual Maldivian headline face. Drop
+   waheed.woff2 (or .ttf) into public/fonts, or have it installed locally.
+   Without it, bold Noto Sans Thaana fills in. The face covers Thaana
+   only, so English words in the same heading stay in Inter. */
+@font-face {
+    font-family: "Waheed";
+    font-weight: 500 900;
+    font-display: swap;
+    unicode-range: U+0780-07BF, U+060C, U+061B, U+061F, U+FDF2;
+    src: local("A_Waheed"), local("Waheed"),
+        url("/fonts/waheed.woff2") format("woff2"),
+        url("/fonts/waheed.ttf") format("truetype"),
+        url("../../node_modules/@fontsource/noto-sans-thaana/files/noto-sans-thaana-thaana-700-normal.woff2") format("woff2");
+}
+
+[dir="rtl"] :is(h1, h2, h3, b, strong, .font-semibold, .font-bold, .font-medium),
+[lang="dv"] :is(h1, h2, h3, b, strong, .font-semibold, .font-bold, .font-medium) {
+    font-family: "Waheed", "Noto Sans Thaana", Inter, sans-serif;
+    font-weight: 600;
+}
