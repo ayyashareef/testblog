@@ -52,7 +52,7 @@
                     <a href="{{ route('events.index') }}" class="text-xs text-ink-400 no-underline hover:text-ink-100">{{ __('All events →') }}</a>
                 </div>
                 @if ($events->isEmpty())
-                    <p class="mt-4 text-ink-400">{{ __('Nothing yet. Run :command to read the feeds.', ['command' => 'php artisan news:fetch']) }}</p>
+                    <p class="mt-4 text-ink-400">{{ __('No news yet. The feeds are read every ten minutes, so check back in a minute.') }}</p>
                 @else
                     <ul class="mt-2 divide-y divide-ink-800">
                         @foreach ($events as $event)

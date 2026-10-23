@@ -30,6 +30,16 @@ php artisan serve
 
 In production, run the scheduler (`* * * * * php artisan schedule:run`). It fetches every ten minutes and snapshots the map every hour.
 
+## Free hosting on Render
+
+The repo includes a `Dockerfile` and a `render.yaml` Blueprint for Render's free plan (Singapore region).
+
+1. Merge this into `main`.
+2. Sign in at [render.com](https://render.com) with GitHub, then go to **New → Blueprint** and pick this repository.
+3. Click **Apply**. The first build takes a few minutes; the site's link (`https://raajje-watch….onrender.com`) appears at the top of the service page.
+
+Render's free plan has no cron and no lasting disk, so the container runs Laravel's scheduler itself and reads the feeds as soon as it starts. The site sleeps after 15 minutes without visitors; the next visit takes about a minute to wake it, and it starts with an empty database that refills from the feeds. Share `?lang=dv` links for the Dhivehi version.
+
 ## Dhivehi version
 
 Every page is available in Dhivehi with a right-to-left layout: use the **ދިވެހި** button in the header, or add `?lang=dv` to any link (the choice is remembered). Interface text lives in `lang/dv.json`; a test fails if a string is added without a translation. Atoll names use their Dhivehi spellings, and when an event includes a Dhivehi article its Dhivehi headline is shown. The Thaana font (Noto Sans Thaana) is bundled with the app instead of loaded from Google Fonts. Headings and headlines use **MV Waheed** for Dhivehi and **Source Serif 4** for English (both in `public/fonts/`, see `public/fonts/README.md`).

@@ -34,7 +34,7 @@
     "live": "ލައިވް",
     "Most covered · last :hours h": "އެންމެ ގިނައިން ލިޔެވުނު · ފާއިތުވި :hours ގަޑިއިރު",
     "All events →": "ހުރިހާ ހަބަރެއް ←",
-    "Nothing yet. Run :command to read the feeds.": "އަދި އެއްވެސް ހަބަރެއް ނެތް. ފީޑުތައް ކިޔުމަށް :command ރަން ކުރޭ.",
+    "No news yet. The feeds are read every ten minutes, so check back in a minute.": "އަދި އެއްވެސް ހަބަރެއް ނެތް. ކޮންމެ 10 މިނިޓަކުން ފީޑުތައް ކިޔޭ، އެއް މިނިޓު ފަހުން އަލުން ބައްލަވާ.",
     "Developing situations": "ކުރިއަރަމުންދާ ހާލަތްތައް",
     "Atoll": "އަތޮޅު",
     "Events that mention :name or one of its islands.": ":name ނުވަތަ އެ އަތޮޅުގެ ރަށެއް ފާހަގަކުރާ ހަބަރުތައް.",
