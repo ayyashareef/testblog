@@ -1,66 +1,66 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Raajje Watch
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Every Maldivian news story, read from every outlet, grouped into events and mapped by atoll.
 
-## About Laravel
+Raajje Watch reads the RSS feeds of Maldivian outlets (English and Dhivehi), works out which articles cover the same happening, and squashes them into one **event**. Related events are chained into **situations** with dated timelines, so you can follow how a story developed over weeks instead of re-reading the same headline. A dot map of the atolls shows where the news is right now, and every hour gets a permanent link.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Pages
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+| URL | What |
+| --- | --- |
+| `/` | The Maldives right now: atoll map plus the most covered events of the last 24 hours |
+| `/map/2026-10-21T14` | The map as it was at that hour (UTC) |
+| `/events`, `/events/{id}` | Event archive, filterable by tier; one event with all its coverage |
+| `/situations`, `/situations/{slug}` | Stories over time |
+| `/atolls/{code}` | Events for one atoll (`S` = Addu, `MLE` = Malé, ...) |
+| `/observatory` | Stats: articles per event, single-day share, busiest atolls, sources |
+| `/developers` | The free JSON API under `/api/v1` |
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Running it
 
-## Learning Laravel
+```bash
+composer install && npm install && npm run build
+cp .env.example .env && php artisan key:generate
+touch database/database.sqlite && php artisan migrate
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+php artisan db:seed          # optional: made-up demo stories
+php artisan news:fetch       # read the real feeds
+php artisan serve
+```
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+In production, run the scheduler (`* * * * * php artisan schedule:run`). It fetches every ten minutes and snapshots the map every hour.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Free hosting on Render
 
-## Laravel Sponsors
+The repo includes a `Dockerfile` and a `render.yaml` Blueprint for Render's free plan (Singapore region).
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+1. Merge this into `main`.
+2. Sign in at [render.com](https://render.com) with GitHub, then go to **New → Blueprint** and pick this repository.
+3. Click **Apply**. The first build takes a few minutes; the site's link (`https://raajje-watch….onrender.com`) appears at the top of the service page.
 
-### Premium Partners
+Render's free plan has no cron and no lasting disk, so the container runs Laravel's scheduler itself and reads the feeds as soon as it starts. The site sleeps after 15 minutes without visitors; the next visit takes about a minute to wake it, and it starts with an empty database that refills from the feeds. Share `?lang=dv` links for the Dhivehi version.
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+## Dhivehi version
 
-## Contributing
+Every page is available in Dhivehi with a right-to-left layout: use the **ދިވެހި** button in the header, or add `?lang=dv` to any link (the choice is remembered). Interface text lives in `lang/dv.json`; a test fails if a string is added without a translation. Atoll names use their Dhivehi spellings, and when an event includes a Dhivehi article its Dhivehi headline is shown. The Thaana font (Noto Sans Thaana) is bundled with the app instead of loaded from Google Fonts. Headings and headlines use **MV Waheed** for Dhivehi and **Source Serif 4** for English (both in `public/fonts/`, see `public/fonts/README.md`).
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## How it works
 
-## Code of Conduct
+- **Sources** live in `config/news.php`. Any RSS or Atom feed works; a broken feed is logged and skipped.
+- **Clustering** (`app/Services/News/Clusterer.php`): headline and summary become TF-IDF weighted words. An article joins the most similar event from the last 48 hours if cosine similarity is at least 0.32, or starts a new one. Events that share at least three words and are loosely similar (at least 0.18) within 21 days become a situation. Events set in different atolls need the stricter 0.32. All thresholds can be set in `.env` (`NEWS_EVENT_THRESHOLD`, ...).
+- **Places** (`config/places.php`): a gazetteer of all 20 atolls plus Malé, with island names and Dhivehi spellings.
+- **Tiers**: notable = 2+ outlets, major = 4+, exceptional = 6+ outlets and 10+ articles.
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## Known limits / next steps
 
-## Security Vulnerabilities
+- Dhivehi and English reports of the same event are not merged yet, so in the Dhivehi version most headlines from English outlets stay in English. Multilingual embeddings or an LLM pass would fix that.
+- The Dhivehi interface text was written without a native speaker's review; please have someone check `lang/dv.json`.
+- Feed URLs in `config/news.php` are best guesses; check each one with `php artisan news:fetch --source=sun` and adjust.
+- Tiers are rule-based; an LLM judge could rate significance instead.
+- An MCP server over the same data would make it usable from AI assistants.
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## Tests
 
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+```bash
+vendor/bin/pest
+```

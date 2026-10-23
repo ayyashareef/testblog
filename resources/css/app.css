@@ -1,3 +1,98 @@
+@import "@fontsource/noto-sans-thaana/400.css";
+@import "@fontsource/noto-sans-thaana/600.css";
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+    body {
+        @apply bg-ink-950 text-ink-100 antialiased;
+    }
+
+    [lang="dv"] {
+        @apply font-thaana;
+        line-height: 1.9;
+    }
+
+    a {
+        @apply decoration-ink-600 underline-offset-4;
+    }
+}
+
+@layer components {
+    .eyebrow {
+        @apply font-mono text-[11px] uppercase tracking-[0.18em] text-ink-400;
+    }
+
+    .stat {
+        @apply font-mono text-ink-100;
+    }
+
+    .stat small {
+        @apply ml-1 text-[11px] text-ink-400;
+    }
+
+    .panel {
+        @apply rounded-2xl border border-ink-800 bg-ink-900/70;
+    }
+
+    .link {
+        @apply underline hover:text-ember-300 hover:decoration-ember-400;
+    }
+}
+
+/* Dhivehi: Thaana everywhere, and no letter-spacing or capitals, which
+   pull apart the vowel marks. */
+[dir="rtl"] body {
+    @apply font-thaana;
+}
+
+[dir="rtl"] .eyebrow,
+[dir="rtl"] .tier {
+    @apply font-thaana text-xs normal-case tracking-normal;
+}
+
+[dir="rtl"] .meta {
+    @apply font-thaana text-xs;
+}
+
+[dir="rtl"] .stat small {
+    @apply font-thaana text-xs;
+}
+
+[dir="rtl"] h1,
+[dir="rtl"] h2 {
+    line-height: 1.6;
+}
+
+/* Headlines: Waheed for Thaana letters, Source Serif 4 for Latin ones.
+   Waheed's face covers only the Thaana block, so in a mixed heading each
+   script gets its own font. Waheed is served as the original .otf (its
+   copyright forbids editing); if it is missing, bold Noto Sans Thaana
+   fills in. */
+@font-face {
+    font-family: "Waheed";
+    font-weight: 400 900;
+    font-display: swap;
+    unicode-range: U+0780-07BF, U+060C, U+061B, U+061F, U+FDF2;
+    src: local("MV Waheed"), local("MVWaheed"), local("A_Waheed"),
+        url("/fonts/waheed.otf") format("opentype"),
+        url("../../node_modules/@fontsource/noto-sans-thaana/files/noto-sans-thaana-thaana-700-normal.woff2") format("woff2");
+}
+
+@font-face {
+    font-family: "Source Serif 4";
+    font-weight: 200 900;
+    font-display: swap;
+    src: url("/fonts/source-serif-4.woff2") format("woff2-variations"),
+        url("/fonts/source-serif-4.woff2") format("woff2");
+}
+
+:is(h1, h3, b, strong, .font-medium, .font-semibold, .font-bold):not(.font-mono) {
+    font-family: "Waheed", "Source Serif 4", "Noto Sans Thaana", Georgia, serif;
+}
+
+[dir="rtl"] :is(h1, h3, b, strong, .font-medium, .font-semibold, .font-bold):not(.font-mono) {
+    font-weight: 600;
+}
