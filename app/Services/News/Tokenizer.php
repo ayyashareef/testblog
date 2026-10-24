@@ -63,7 +63,8 @@ class Tokenizer
     {
         $text = mb_strtolower(html_entity_decode($text, ENT_QUOTES | ENT_HTML5, 'UTF-8'));
         $text = preg_replace("/[’']s\b/u", '', $text);
-        $parts = preg_split('/[^\p{L}\p{M}\p{N}]+/u', $text, -1, PREG_SPLIT_NO_EMPTY);
+        // preg_split returns false on malformed UTF-8; treat that as no words.
+        $parts = preg_split('/[^\p{L}\p{M}\p{N}]+/u', $text, -1, PREG_SPLIT_NO_EMPTY) ?: [];
 
         $words = [];
         foreach ($parts as $part) {
