@@ -86,7 +86,7 @@ class MapService
 
     /**
      * @param  array<string, int>  $counts
-     * @return array{dots: list<array>, labels: list<array>, width: int, height: int}
+     * @return array{dots: list<array{x: float, y: float, code: string, ring: bool, level: int}>, labels: list<array>, width: int, height: int}
      */
     public function render(array $counts): array
     {
@@ -103,15 +103,13 @@ class MapService
 
                 $small = $places[$code]['rx'] < 0.05;
                 $onRing = $small || $d >= 0.55;
-                $intensity = $this->intensity($counts[$code] ?? 0, $max);
-
                 [$x, $y] = $this->project($lat, $lon);
                 $dots[] = [
                     'x' => round($x, 1),
                     'y' => round($y, 1),
                     'code' => $code,
-                    'r' => $onRing ? 1.7 : 1.1,
-                    'fill' => $onRing ? $this->color($intensity) : $this->lagoon($intensity),
+                    'ring' => $onRing,
+                    'level' => $this->level($this->intensity($counts[$code] ?? 0, $max)),
                 ];
             }
         }
@@ -132,36 +130,13 @@ class MapService
         return $count > 0 ? 0.15 + 0.85 * log(1 + $count) / log(1 + $max) : 0.0;
     }
 
-    public function color(float $t): string
+    /**
+     * Bucket an intensity into one of five heat levels (0 = no news) that
+     * the stylesheet colours, so the map follows the light or dark theme.
+     */
+    public function level(float $t): int
     {
-        if ($t <= 0) {
-            return '#1e2a3a';
-        }
-
-        // dark rust -> orange -> pale gold, like embers
-        $stops = [[0.0, [124, 45, 18]], [0.55, [234, 116, 26]], [1.0, [253, 230, 138]]];
-
-        return $this->interpolate($stops, $t);
-    }
-
-    private function lagoon(float $t): string
-    {
-        return $t <= 0 ? '#142030' : $this->interpolate([[0.0, [40, 30, 28]], [1.0, [110, 70, 30]]], $t);
-    }
-
-    private function interpolate(array $stops, float $t): string
-    {
-        for ($i = 1; $i < count($stops); $i++) {
-            [$t1, $c1] = $stops[$i];
-            [$t0, $c0] = $stops[$i - 1];
-            if ($t <= $t1) {
-                $f = ($t - $t0) / ($t1 - $t0);
-
-                return sprintf('#%02x%02x%02x', ...array_map(fn ($a, $b) => (int) round($a + ($b - $a) * $f), $c0, $c1));
-            }
-        }
-
-        return sprintf('#%02x%02x%02x', ...end($stops)[1]);
+        return $t <= 0 ? 0 : min(5, 1 + (int) floor($t * 5));
     }
 
     /**
@@ -213,13 +188,13 @@ class MapService
                 'anchor_x' => round($x + 3, 1),
                 'anchor_y' => round($y, 1),
                 'y' => $y,
-                'color' => $this->color($this->intensity($counts[$code] ?? 0, $max)),
+                'level' => $this->level($this->intensity($counts[$code] ?? 0, $max)),
             ];
         }
 
         usort($labels, fn ($a, $b) => $a['y'] <=> $b['y']);
 
-        $minGap = 22;
+        $minGap = 26;
         for ($i = 1; $i < count($labels); $i++) {
             $labels[$i]['y'] = max($labels[$i]['y'], $labels[$i - 1]['y'] + $minGap);
         }

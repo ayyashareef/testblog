@@ -1,20 +1,22 @@
 @props(['map'])
 @php
-    $dv = app()->getLocale() === 'dv';
+    $groups = collect($map['dots'])->groupBy(fn ($d) => $d['level'].($d['ring'] ? 'r' : 'l'));
 @endphp
 <svg viewBox="0 0 {{ $map['width'] }} {{ $map['height'] }}" role="img" aria-label="{{ __('Dot map of the Maldives, each atoll coloured by how many news events mention it') }}" {{ $attributes->class('h-auto w-full') }} direction="ltr">
-    <g>
-        @foreach ($map['dots'] as $dot)
-            <circle cx="{{ $dot['x'] }}" cy="{{ $dot['y'] }}" r="{{ $dot['r'] }}" fill="{{ $dot['fill'] }}"/>
-        @endforeach
-    </g>
-    <g font-family="{{ $dv ? 'Noto Sans Thaana, Faruma, sans-serif' : 'JetBrains Mono, monospace' }}" font-size="{{ $dv ? 12 : 11 }}">
+    @foreach ($groups as $key => $dots)
+        <g class="heat-{{ (int) $key }}" @if (str_ends_with($key, 'l')) opacity="0.4" @endif>
+            @foreach ($dots as $dot)
+                <circle cx="{{ $dot['x'] }}" cy="{{ $dot['y'] }}" r="{{ $dot['ring'] ? 1.7 : 1.1 }}"/>
+            @endforeach
+        </g>
+    @endforeach
+    <g font-size="15">
         @foreach ($map['labels'] as $label)
-            <a href="{{ route('atolls.show', $label['code']) }}">
-                <path d="M{{ $label['anchor_x'] }} {{ $label['anchor_y'] }} L{{ $label['x'] - 30 }} {{ $label['y'] }} H{{ $label['x'] - 6 }}" fill="none" stroke="#2a3a57" stroke-width="0.75"/>
-                <circle cx="{{ $label['x'] - 2 }}" cy="{{ $label['y'] }}" r="3" fill="{{ $label['color'] }}"/>
-                <text x="{{ $label['x'] + 6 }}" y="{{ $label['y'] + 4 }}" fill="{{ $label['count'] ? '#e6ebf3' : '#7d8ba6' }}">{{ $label['name'] }}</text>
-                <text x="{{ $map['width'] - 4 }}" y="{{ $label['y'] + 4 }}" text-anchor="end" font-family="JetBrains Mono, monospace" font-size="11" fill="{{ $label['count'] ? '#f8b24a' : '#2a3a57' }}">{{ $label['count'] }}</text>
+            <a href="{{ route('atolls.show', $label['code']) }}" @class(['text-ink' => $label['count'], 'text-muted' => ! $label['count']])>
+                <path d="M{{ $label['anchor_x'] }} {{ $label['anchor_y'] }} L{{ $label['x'] - 30 }} {{ $label['y'] }} H{{ $label['x'] - 6 }}" fill="none" stroke="currentColor" stroke-opacity="0.35" stroke-width="0.75"/>
+                <circle cx="{{ $label['x'] - 2 }}" cy="{{ $label['y'] }}" r="3" class="heat-{{ $label['level'] }}"/>
+                <text x="{{ $label['x'] + 6 }}" y="{{ $label['y'] + 5 }}" fill="currentColor" @class(['font-medium' => $label['count']])>{{ $label['name'] }}</text>
+                <text x="{{ $map['width'] - 4 }}" y="{{ $label['y'] + 5 }}" text-anchor="end" fill="currentColor" class="tabular-nums">{{ $label['count'] ?: '' }}</text>
                 <title>{{ $label['name'] }}: {{ trans_choice(':count event|:count events', $label['count']) }}</title>
             </a>
         @endforeach

@@ -5,72 +5,132 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Theme. Values are space-separated RGB so Tailwind can add opacity. */
+:root {
+    --page: 255 255 255;
+    --sunken: 246 247 249;
+    --line: 226 229 234;
+    --ink: 23 28 36;
+    --muted: 92 102 117;
+    --accent: 0 122 112;
+    --accent-ink: 0 92 84;
+
+    /* Map heat, none to most. */
+    --heat-0: 214 219 226;
+    --heat-1: 167 222 214;
+    --heat-2: 103 194 181;
+    --heat-3: 38 158 145;
+    --heat-4: 0 118 108;
+    --heat-5: 0 77 70;
+
+    color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --page: 15 18 23;
+        --sunken: 21 25 32;
+        --line: 41 47 57;
+        --ink: 229 233 239;
+        --muted: 145 155 170;
+        --accent: 62 201 183;
+        --accent-ink: 120 222 208;
+
+        --heat-0: 45 52 63;
+        --heat-1: 24 86 80;
+        --heat-2: 22 125 114;
+        --heat-3: 38 166 151;
+        --heat-4: 92 209 192;
+        --heat-5: 170 238 228;
+
+        color-scheme: dark;
+    }
+}
+
 @layer base {
     body {
-        @apply bg-ink-950 text-ink-100 antialiased;
+        @apply bg-page text-ink antialiased;
+        font-feature-settings: "cv11", "ss01";
+    }
+
+    h1, h2, h3 {
+        @apply font-semibold tracking-tight text-ink;
+    }
+
+    a {
+        @apply text-accent underline-offset-2 hover:underline;
+    }
+
+    code {
+        @apply rounded bg-sunken px-1 py-0.5 font-mono text-[0.85em];
     }
 
     [lang="dv"] {
         @apply font-thaana;
         line-height: 1.9;
     }
-
-    a {
-        @apply decoration-ink-600 underline-offset-4;
-    }
 }
 
 @layer components {
-    .eyebrow {
-        @apply font-mono text-[11px] uppercase tracking-[0.18em] text-ink-400;
+    /* Plain data tables, the main way lists are shown. */
+    .data-table {
+        @apply w-full border-collapse text-sm;
     }
 
-    .stat {
-        @apply font-mono text-ink-100;
+    .data-table th {
+        @apply border-b border-line py-2 pe-4 text-start text-xs font-medium text-muted;
     }
 
-    .stat small {
-        @apply ml-1 text-[11px] text-ink-400;
+    .data-table td {
+        @apply border-b border-line py-2.5 pe-4 align-top;
     }
 
-    .panel {
-        @apply rounded-2xl border border-ink-800 bg-ink-900/70;
+    .data-table tr:last-child td {
+        @apply border-b-0;
     }
 
-    .link {
-        @apply underline hover:text-ember-300 hover:decoration-ember-400;
+    .data-table .num {
+        @apply text-end tabular-nums;
+    }
+
+    /* Note box, like a docs admonition. */
+    .callout {
+        @apply rounded-md border border-line border-s-4 border-s-accent bg-sunken px-4 py-3 text-sm;
+    }
+
+    .sidebar-link {
+        @apply block rounded-md px-2.5 py-1.5 text-sm text-muted no-underline hover:bg-sunken hover:text-ink hover:no-underline;
+    }
+
+    .sidebar-link[aria-current="page"] {
+        @apply bg-sunken font-medium text-accent-ink;
+    }
+
+    .sidebar-heading {
+        @apply mb-1 mt-6 px-2.5 text-xs font-semibold text-ink first:mt-0;
+    }
+
+    .breadcrumb {
+        @apply mb-3 flex flex-wrap gap-1.5 text-sm text-muted;
+    }
+
+    .meta {
+        @apply text-sm text-muted;
     }
 }
 
-/* Dhivehi: Thaana everywhere, and no letter-spacing or capitals, which
-   pull apart the vowel marks. */
-[dir="rtl"] body {
-    @apply font-thaana;
-}
+/* Atoll map heat levels. */
+.heat-0 { fill: rgb(var(--heat-0)); }
+.heat-1 { fill: rgb(var(--heat-1)); }
+.heat-2 { fill: rgb(var(--heat-2)); }
+.heat-3 { fill: rgb(var(--heat-3)); }
+.heat-4 { fill: rgb(var(--heat-4)); }
+.heat-5 { fill: rgb(var(--heat-5)); }
 
-[dir="rtl"] .eyebrow,
-[dir="rtl"] .tier {
-    @apply font-thaana text-xs normal-case tracking-normal;
-}
-
-[dir="rtl"] .meta {
-    @apply font-thaana text-xs;
-}
-
-[dir="rtl"] .stat small {
-    @apply font-thaana text-xs;
-}
-
-[dir="rtl"] h1,
-[dir="rtl"] h2 {
-    line-height: 1.6;
-}
-
-/* Headlines: Waheed for Thaana letters, Source Serif 4 for Latin ones.
-   Waheed's face covers only the Thaana block, so in a mixed heading each
-   script gets its own font. Waheed is served as the original .otf (its
-   copyright forbids editing); if it is missing, bold Noto Sans Thaana
-   fills in. */
+/* Dhivehi: Thaana throughout; headings in Waheed. Waheed's face covers only
+   the Thaana block, so English words inside a heading stay in Inter. It is
+   served as the original .otf (its copyright forbids editing); if it is
+   missing, bold Noto Sans Thaana fills in. */
 @font-face {
     font-family: "Waheed";
     font-weight: 400 900;
@@ -81,18 +141,14 @@
         url("../../node_modules/@fontsource/noto-sans-thaana/files/noto-sans-thaana-thaana-700-normal.woff2") format("woff2");
 }
 
-@font-face {
-    font-family: "Source Serif 4";
-    font-weight: 200 900;
-    font-display: swap;
-    src: url("/fonts/source-serif-4.woff2") format("woff2-variations"),
-        url("/fonts/source-serif-4.woff2") format("woff2");
+[dir="rtl"] body {
+    @apply font-thaana;
 }
 
-:is(h1, h3, b, strong, .font-medium, .font-semibold, .font-bold):not(.font-mono) {
-    font-family: "Waheed", "Source Serif 4", "Noto Sans Thaana", Georgia, serif;
+:is([dir="rtl"], [lang="dv"]) :is(h1, h2, h3, .font-semibold) {
+    font-family: "Waheed", Inter, "Noto Sans Thaana", sans-serif;
 }
 
-[dir="rtl"] :is(h1, h3, b, strong, .font-medium, .font-semibold, .font-bold):not(.font-mono) {
-    font-weight: 600;
+[dir="rtl"] :is(h1, h2) {
+    line-height: 1.6;
 }

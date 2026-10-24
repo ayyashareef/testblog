@@ -2,31 +2,37 @@
     $base = url('/api/v1');
     $dv = app()->getLocale() === 'dv';
     $endpoints = [
-        ['GET', '/events', 'Latest events. Filters: tier, atoll (code, e.g. S for Addu), since (ISO date), per_page (max 100).'],
-        ['GET', '/events/{id}', 'One event with every article that covered it.'],
-        ['GET', '/situations', 'Chains of related events, newest first.'],
-        ['GET', '/situations/{slug}', 'One situation with its dated timeline of events.'],
-        ['GET', '/map', 'Events per atoll. Optional at (ISO time) and hours (1–168).'],
-        ['GET', '/stats', 'Observatory numbers for the whole archive.'],
-        ['GET', '/sources', 'Every outlet read and how many articles each contributed.'],
+        ['/events', 'Latest events. Filters: tier, atoll (code, e.g. S for Addu), since (ISO date), per_page (max 100).'],
+        ['/events/{id}', 'One event with every article that covered it.'],
+        ['/situations', 'Chains of related events, newest first.'],
+        ['/situations/{slug}', 'One situation with its dated timeline of events.'],
+        ['/map', 'Events per atoll. Optional at (ISO time) and hours (1–168).'],
+        ['/stats', 'Observatory numbers for the whole archive.'],
+        ['/sources', 'Every outlet read and how many articles each contributed.'],
     ];
 @endphp
 <x-layouts.app :title="__('API')">
-    <p class="eyebrow">{{ __('Developers') }}</p>
-    <h1 class="mt-2 text-2xl font-semibold">{{ __('A free JSON API') }}</h1>
-    <p class="mt-2 max-w-2xl text-ink-400">{{ __('Everything on this site is available as JSON. No key needed; please stay under 60 requests a minute.') }}</p>
+    <h1 class="text-3xl">{{ __('API') }}</h1>
+    <p class="mt-3 text-lg text-muted">{{ __('Everything on this site is available as JSON. No key needed; please stay under 60 requests a minute.') }}</p>
 
-    <div class="panel mt-6 divide-y divide-ink-800">
-        @foreach ($endpoints as [$method, $path, $about])
-            <div class="grid gap-1 p-4 sm:grid-cols-[220px_1fr] sm:gap-4">
-                <code class="font-mono text-sm" dir="ltr"><span class="text-lagoon">{{ $method }}</span> {{ $path }}</code>
-                <p class="text-sm text-ink-300">{{ __($about) }}</p>
-            </div>
-        @endforeach
-    </div>
+    <h2 class="mt-10 text-xl">{{ __('Base URL') }}</h2>
+    <pre dir="ltr" class="mt-3 overflow-x-auto rounded-md border border-line bg-sunken p-4 text-start font-mono text-sm">{{ $base }}</pre>
 
-    <h2 class="eyebrow mt-8">{{ __('Example') }}</h2>
-    <pre dir="ltr" class="panel mt-3 overflow-x-auto p-4 text-left font-mono text-xs leading-relaxed text-ink-300">curl {{ $base }}/events?atoll=S&amp;tier=major
+    <h2 class="mt-10 text-xl">{{ __('Endpoints') }}</h2>
+    <table class="data-table mt-3">
+        <thead><tr><th>{{ __('Request') }}</th><th>{{ __('Returns') }}</th></tr></thead>
+        <tbody>
+            @foreach ($endpoints as [$path, $about])
+                <tr>
+                    <td class="whitespace-nowrap" dir="ltr"><code>GET {{ $path }}</code></td>
+                    <td>{{ __($about) }}</td>
+                </tr>
+            @endforeach
+        </tbody>
+    </table>
+
+    <h2 class="mt-10 text-xl">{{ __('Example') }}</h2>
+    <pre dir="ltr" class="mt-3 overflow-x-auto rounded-md border border-line bg-sunken p-4 text-start font-mono text-sm leading-relaxed">curl "{{ $base }}/events?atoll=S&amp;tier=major"
 
 {
   "data": [
@@ -38,18 +44,19 @@
       "source_count": 5,
       "article_count": 9,
       "atolls": ["S"],
-      "first_seen_at": "2026-10-20T03:12:00+00:00",
-      ...
+      "first_seen_at": "2026-10-20T03:12:00+00:00"
     }
   ],
-  "current_page": 1,
-  ...
+  "current_page": 1
 }</pre>
 
-    <h2 class="eyebrow mt-8">{{ __('Atoll codes') }}</h2>
-    <div class="mt-3 grid grid-cols-2 gap-x-6 gap-y-1 text-sm sm:grid-cols-4">
-        @foreach (config('places') as $code => $place)
-            <div><code class="font-mono text-ember-400">{{ $code }}</code> <span class="text-ink-300">{{ $dv ? $place['name_dv'] : $place['name'] }}</span></div>
-        @endforeach
-    </div>
+    <h2 class="mt-10 text-xl">{{ __('Atoll codes') }}</h2>
+    <table class="data-table mt-3">
+        <thead><tr><th>{{ __('Code') }}</th><th>{{ __('Atoll') }}</th></tr></thead>
+        <tbody>
+            @foreach (config('places') as $code => $place)
+                <tr><td dir="ltr"><code>{{ $code }}</code></td><td>{{ $dv ? $place['name_dv'] : $place['name'] }}</td></tr>
+            @endforeach
+        </tbody>
+    </table>
 </x-layouts.app>
