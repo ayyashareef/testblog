@@ -4,6 +4,7 @@ namespace App\Services\News;
 
 use App\Models\Article;
 use App\Models\Source;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -60,16 +61,21 @@ class Ingestor
 
             $title = $this->stripAggregatorSuffix($source, $item['title']);
 
-            Article::create([
-                'source_id' => $source->id,
-                'guid' => $item['guid'],
-                'url' => $item['url'],
-                'title' => $title,
-                'summary' => $item['summary'],
-                'lang' => Tokenizer::thaanaRatio($title) > 0.3 ? 'dv' : 'en',
-                'published_at' => $item['published_at'],
-                'tokens' => $this->tokenizer->terms($title, $item['summary']),
-            ]);
+            try {
+                Article::create([
+                    'source_id' => $source->id,
+                    'guid' => $item['guid'],
+                    'url' => $item['url'],
+                    'title' => $title,
+                    'summary' => $item['summary'],
+                    'lang' => Tokenizer::thaanaRatio($title) > 0.3 ? 'dv' : 'en',
+                    'published_at' => $item['published_at'],
+                    'tokens' => $this->tokenizer->terms($title, $item['summary']),
+                ]);
+            } catch (UniqueConstraintViolationException) {
+                // An overlapping run stored it first.
+                continue;
+            }
 
             $known[$item['guid']] = true;
             $stored++;
